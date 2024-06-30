@@ -50,7 +50,7 @@ const HomePage = () => {
         } else {
           setRecipes(prevRecipes => [...prevRecipes, ...data.hits.map(hit => hit.recipe)]);
         }
-        setTotalPages(Math.ceil(data.count / 8));
+        setTotalPages(Math.ceil(data.count / 6));
       }
     } catch (err) {
       setError('An error occurred while fetching recipes. Please try again.');
@@ -69,7 +69,7 @@ const HomePage = () => {
   const handleSeeLess = () => {
     if (currentPage > 1) {
       const newPage = currentPage - 1;
-      setRecipes(prevRecipes => prevRecipes.slice(0, newPage * 8));
+      setRecipes(prevRecipes => prevRecipes.slice(0, newPage * 6));
       setCurrentPage(newPage);
     }
   };
@@ -99,15 +99,42 @@ const HomePage = () => {
         )}
       </div>
       
+    <Modal
+      isOpen={!!error}
+      onRequestClose={closeModal}
+      className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 p-4"
+      overlayClassName="fixed inset-0 bg-black bg-opacity-50"
+    >
+      <div className="bg-white rounded-3xl p-6 max-w-md w-full mx-auto border-solid border-x-2 border-y-2 border-black">
+        <h2 className="text-xl font-semibold mb-4">Error</h2>
+        <p className="mb-4">{error}</p>
+        <button
+          onClick={closeModal}
+          className="bg-amber-500 hover:bg-amber-600 transition-all text-white font-bold py-2 px-4 rounded-full border-solid border-x-2 border-y-2 border-black"
+        >
+          Close
+        </button>
+      </div>
+    </Modal>
+
+    {selectedRecipe && (
       <Modal
-        isOpen={!!error}
+        isOpen={!!selectedRecipe}
         onRequestClose={closeModal}
-        className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75"
+        className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-75 p-4"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50"
       >
-        <div className="bg-white rounded-3xl p-6 max-w-md mx-auto border-solid border-x-2 border-y-2 border-black">
-          <h2 className="text-xl font-semibold mb-4">Error</h2>
-          <p className="mb-4">{error}</p>
+        <div className="bg-white rounded-3xl p-6 max-w-lg w-full mx-auto border-solid border-x-2 border-y-2 border-black">
+          <h2 className="text-2xl font-semibold mb-4">{selectedRecipe.label}</h2>
+          <img src={selectedRecipe.image} alt={selectedRecipe.label} className="w-full mb-4 rounded-xl border-solid border-x-2 border-y-2 border-black" />
+          <p className="mb-4"><strong>Ingredients:</strong> {selectedRecipe.ingredientLines.join(', ')}</p>
+          <p className="mb-4"><strong>Instructions:</strong> {selectedRecipe.instructions || 'No instructions available.'}</p>
+          <button
+            onClick={() => window.open(selectedRecipe.url, '_blank')}
+            className="bg-amber-500 hover:bg-amber-600 transition-all text-white font-bold py-2 px-4 rounded-full mr-2 border-solid border-x-2 border-y-2 border-black"
+          >
+            View Recipe Source
+          </button>
           <button
             onClick={closeModal}
             className="bg-amber-500 hover:bg-amber-600 transition-all text-white font-bold py-2 px-4 rounded-full border-solid border-x-2 border-y-2 border-black"
@@ -116,44 +143,17 @@ const HomePage = () => {
           </button>
         </div>
       </Modal>
+    )}
 
-      {selectedRecipe && (
-        <Modal
-          isOpen={!!selectedRecipe}
-          onRequestClose={closeModal}
-          className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-75"
-          overlayClassName="fixed inset-0 bg-black bg-opacity-50"
-        >
-          <div className="bg-white rounded-3xl p-6 max-w-lg mx-auto border-solid border-x-2 border-y-2 border-black">
-            <h2 className="text-2xl font-semibold mb-4">{selectedRecipe.label}</h2>
-            <img src={selectedRecipe.image} alt={selectedRecipe.label} className="w-full mb-4 rounded-xl border-solid border-x-2 border-y-2 border-black" />
-            <p className="mb-4"><strong>Ingredients:</strong> {selectedRecipe.ingredientLines.join(', ')}</p>
-            <p className="mb-4"><strong>Instructions:</strong> {selectedRecipe.instructions || 'No instructions available.'}</p>
-            <button
-              onClick={() => window.open(selectedRecipe.url, '_blank')}
-              className="bg-amber-500 hover:bg-amber-600 transition-all text-white font-bold py-2 px-4 rounded-full mr-2 border-solid border-x-2 border-y-2 border-black"
-            >
-              View Recipe Source
-            </button>
-            <button
-              onClick={closeModal}
-              className="bg-amber-500 hover:bg-amber-600 transition-all text-white font-bold py-2 px-4 rounded-full border-solid border-x-2 border-y-2 border-black"
-            >
-              Close
-            </button>
-          </div>
-        </Modal>
-      )}
-
-      <div className='grid grid-cols-4 gap-x-10 gap-y-10 mt-12 mb-12'>
-        {recipes.map((recipe, index) => (
-          <RecipeCard 
-            key={index}
-            recipe={recipe}
-            onClick={() => openRecipeModal(recipe)}
-          />
-        ))}
-      </div>
+    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-10 mt-12 mb-12'>
+      {recipes.map((recipe, index) => (
+        <RecipeCard 
+          key={index}
+          recipe={recipe}
+          onClick={() => openRecipeModal(recipe)}
+        />
+      ))}
+    </div>
 
       <LoadMore 
         onLoadMore={handleLoadMore}
