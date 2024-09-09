@@ -1,5 +1,6 @@
 {
   "name": "recipe-app",
+  "homepage": "https://amirrezasadeghy.github.io/recipe-app/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -46,6 +47,5 @@
   },
   "devDependencies": {
     "tailwindcss": "^3.4.4"
-  },
-  "homepage": "https://amirrezasadeghy.github.io/recipe-app/"
+  }
 }
